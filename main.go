@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"reflect"
+	"strings"
 )
 
 type Payout struct {
@@ -31,6 +32,22 @@ func (p *Payouts) filterPaid() {
 		}
 	}
 	*p = filteredPayouts
+}
+
+func (p *Payouts) convertNumbers() {
+	var convertedPayouts Payouts
+	for _, payout := range *p {
+		payout.Fees = strings.ReplaceAll(payout.Fees, ".", ",")
+		payout.Charges = strings.ReplaceAll(payout.Charges, ".", ",")
+		payout.Refunds = strings.ReplaceAll(payout.Refunds, ".", ",")
+		payout.Adjustments = strings.ReplaceAll(payout.Adjustments, ".", ",")
+		payout.ReservedFunds = strings.ReplaceAll(payout.ReservedFunds, ".", ",")
+		payout.Fees = strings.ReplaceAll(payout.Fees, ".", ",")
+		payout.RetriedAmount = strings.ReplaceAll(payout.RetriedAmount, ".", ",")
+		payout.Total = strings.ReplaceAll(payout.Total, ".", ",")
+		convertedPayouts = append(convertedPayouts, payout)
+	}
+	*p = convertedPayouts
 }
 
 func validateHeader(header []string) error {
@@ -95,6 +112,9 @@ func main() {
 	if err != nil {
 		log.Fatalf("An error occurred: %v", err)
 	}
+
+	printRecordLines(payouts)
 	payouts.filterPaid()
+	payouts.convertNumbers()
 	printRecordLines(payouts)
 }
