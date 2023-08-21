@@ -35,16 +35,18 @@ func (p *Payouts) filterPaid() {
 }
 
 func (p *Payouts) convertNumbers() {
+	convert := func(field string) string {
+		return strings.ReplaceAll(field, ".", ",")
+	}
 	var convertedPayouts Payouts
 	for _, payout := range *p {
-		payout.Fees = strings.ReplaceAll(payout.Fees, ".", ",")
-		payout.Charges = strings.ReplaceAll(payout.Charges, ".", ",")
-		payout.Refunds = strings.ReplaceAll(payout.Refunds, ".", ",")
-		payout.Adjustments = strings.ReplaceAll(payout.Adjustments, ".", ",")
-		payout.ReservedFunds = strings.ReplaceAll(payout.ReservedFunds, ".", ",")
-		payout.Fees = strings.ReplaceAll(payout.Fees, ".", ",")
-		payout.RetriedAmount = strings.ReplaceAll(payout.RetriedAmount, ".", ",")
-		payout.Total = strings.ReplaceAll(payout.Total, ".", ",")
+		payout.Charges = convert(payout.Charges)
+		payout.Refunds = convert(payout.Refunds)
+		payout.Adjustments = convert(payout.Adjustments)
+		payout.ReservedFunds = convert(payout.ReservedFunds)
+		payout.Fees = convert(payout.Fees)
+		payout.RetriedAmount = convert(payout.RetriedAmount)
+		payout.Total = convert(payout.Total)
 		convertedPayouts = append(convertedPayouts, payout)
 	}
 	*p = convertedPayouts
@@ -66,14 +68,12 @@ func printRecordLines(records []Payout) {
 
 func getPayouts() (Payouts, error) {
 	file, err := os.Open("payouts.csv")
-
 	if err != nil {
 		return nil, err
 	}
 
 	reader := csv.NewReader(file)
 	records, err := reader.ReadAll()
-
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +85,6 @@ func getPayouts() (Payouts, error) {
 	}
 
 	var payouts Payouts
-
 	for _, record := range records {
 		payout := Payout{
 			PayoutDate:    record[0],
@@ -99,12 +98,10 @@ func getPayouts() (Payouts, error) {
 			Total:         record[8],
 			Currency:      record[9],
 		}
-
 		payouts = append(payouts, payout)
 	}
 
 	return payouts, nil
-
 }
 
 func main() {
