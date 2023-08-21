@@ -52,6 +52,19 @@ func (p *Payouts) convertNumbers() {
 	*p = convertedPayouts
 }
 
+func (p *Payouts) convertDates() {
+	var convertedPayouts Payouts
+	for _, payout := range *p {
+		date := strings.Split(payout.PayoutDate, "-")
+		year := date[0]
+		month := date[1]
+		day := date[2]
+		payout.PayoutDate = fmt.Sprintf("%v-%v-%v", day, month, year)
+		convertedPayouts = append(convertedPayouts, payout)
+	}
+	*p = convertedPayouts
+}
+
 func validateHeader(header []string) error {
 	expectedHeader := []string{"Payout Date", "Status", "Charges", "Refunds", "Adjustments", "Reserved Funds", "Fees", "Retried Amount", "Total", "Currency"}
 	if !reflect.DeepEqual(header, expectedHeader) {
@@ -113,5 +126,6 @@ func main() {
 	printRecordLines(payouts)
 	payouts.filterPaid()
 	payouts.convertNumbers()
+	payouts.convertDates()
 	printRecordLines(payouts)
 }
