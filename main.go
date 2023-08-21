@@ -7,65 +7,79 @@ import (
 	"os"
 )
 
-func printRecordLines(records [][]string) {
+type Payout struct {
+	PayoutDate    string
+	Status        string
+	Charges       string
+	Refunds       string
+	Adjustments   string
+	ReservedFunds string
+	Fees          string
+	RetriedAmount string
+	Total         string
+	Currency      string
+}
+
+type Payouts []Payout
+
+func (p *Payouts) filterPaid() {
+	var filteredPayouts Payouts
+	for _, payout := range *p {
+		if payout.Status == "paid" {
+			filteredPayouts = append(filteredPayouts, payout)
+		}
+	}
+	*p = filteredPayouts
+}
+
+func printRecordLines(records []Payout) {
 	for _, record := range records {
 		fmt.Println(record)
 	}
 }
 
-func getRecords(filename string) [][]string {
-	payouts, err := os.Open(filename)
+func getPayouts() (Payouts, error) {
+	file, err := os.Open("payouts.csv")
 
 	if err != nil {
-		log.Fatalf("Error on opening file: %v", err)
+		return nil, err
 	}
 
-	reader := csv.NewReader(payouts)
+	reader := csv.NewReader(file)
 	records, err := reader.ReadAll()
 
 	if err != nil {
-		log.Fatalf("Error on reading file: %v", err)
+		return nil, err
 	}
 
-	return records
-}
+	var payouts Payouts
 
-func getHeaderIndex(name string, header []string) int {
-	index := -1
-
-	for i, column := range header {
-		if column == name {
-			index = i
-			break
+	for _, record := range records {
+		payout := Payout{
+			PayoutDate:    record[0],
+			Status:        record[1],
+			Charges:       record[2],
+			Refunds:       record[3],
+			Adjustments:   record[4],
+			ReservedFunds: record[5],
+			Fees:          record[6],
+			RetriedAmount: record[7],
+			Total:         record[8],
+			Currency:      record[9],
 		}
+
+		payouts = append(payouts, payout)
 	}
 
-	if index == -1 {
-		log.Fatal("Could not find header index!")
-	}
+	return payouts, nil
 
-	return index
-}
-
-func removePendingPayouts(payouts [][]string) [][]string {
-	var newPayouts [][]string
-	header := payouts[0]
-	newPayouts = append(newPayouts, header)
-	status := getHeaderIndex("Status", header)
-
-	for _, payout := range payouts {
-		if payout[status] == "paid" {
-			newPayouts = append(newPayouts, payout)
-		}
-	}
-
-	return newPayouts
 }
 
 func main() {
-	payouts := getRecords("payouts.csv")
-	printRecordLines(payouts)
-
-	payouts = removePendingPayouts(payouts)
+	payouts, err := getPayouts()
+	if err != nil {
+		log.Fatalf("Could not get payouts: %v", err)
+	}
+	payouts.filterPaid()
 	printRecordLines(payouts)
 }
