@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"reflect"
 )
 
 type Payout struct {
@@ -32,6 +33,14 @@ func (p *Payouts) filterPaid() {
 	*p = filteredPayouts
 }
 
+func validateHeader(header []string) error {
+	expectedHeader := []string{"Payout Date", "Status", "Charges", "Refunds", "Adjustments", "Reserved Funds", "Fees", "Retried Amount", "Total", "Currency"}
+	if !reflect.DeepEqual(header, expectedHeader) {
+		return fmt.Errorf("unexpected header: got %v, want %v", header, expectedHeader)
+	}
+	return nil
+}
+
 func printRecordLines(records []Payout) {
 	for _, record := range records {
 		fmt.Println(record)
@@ -48,6 +57,12 @@ func getPayouts() (Payouts, error) {
 	reader := csv.NewReader(file)
 	records, err := reader.ReadAll()
 
+	if err != nil {
+		return nil, err
+	}
+
+	header := records[0]
+	err = validateHeader(header)
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +93,7 @@ func getPayouts() (Payouts, error) {
 func main() {
 	payouts, err := getPayouts()
 	if err != nil {
-		log.Fatalf("Could not get payouts: %v", err)
+		log.Fatalf("An error occurred: %v", err)
 	}
 	payouts.filterPaid()
 	printRecordLines(payouts)
