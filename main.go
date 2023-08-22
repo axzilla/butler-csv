@@ -20,8 +20,6 @@ type Payout struct {
 	Total     string
 }
 
-type Payouts []Payout
-
 func logError(err error) {
 	trace := fmt.Sprintf("%s\n%s", err.Error(), debug.Stack())
 	log.Output(2, trace)
@@ -29,15 +27,18 @@ func logError(err error) {
 
 func getHeaderIndex(name string, headers []string) (int, error) {
 	headerIndex := -1
+
 	for i, header := range headers {
 		if header == name {
 			headerIndex = i
 			break
 		}
 	}
+
 	if headerIndex == -1 {
 		return -1, errors.New("Header not found")
 	}
+
 	return headerIndex, nil
 }
 
@@ -46,11 +47,13 @@ func getRecords(filename string) (Records, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	reader := csv.NewReader(file)
 	records, err := reader.ReadAll()
 	if err != nil {
 		return nil, err
 	}
+
 	return records, nil
 }
 
@@ -63,14 +66,17 @@ func convertDate(date string) string {
 	year := dateArr[0]
 	month := dateArr[1]
 	day := dateArr[2]
+
 	return fmt.Sprintf("%v-%v-%v", day, month, year)
 }
 
 func validateHeader(header []string) error {
 	expectedHeader := []string{"Payout Date", "Status", "Charges", "Refunds", "Adjustments", "Reserved Funds", "Fees", "Retried Amount", "Total", "Currency"}
+
 	if !reflect.DeepEqual(header, expectedHeader) {
 		return fmt.Errorf("unexpected header: got %v, want %v", header, expectedHeader)
 	}
+
 	return nil
 }
 
@@ -80,8 +86,8 @@ func printRecordLines(records Records) {
 	}
 }
 
-func createPayout(payoutRecords Records) (Payouts, error) {
-	var payouts Payouts
+func createPayout(payoutRecords Records) ([]Payout, error) {
+	var payouts []Payout
 
 	header := payoutRecords[0]
 	err := validateHeader(header)
@@ -136,6 +142,7 @@ func main() {
 		logError(err)
 		return
 	}
+
 	printRecordLines(payoutRecords)
 
 	payouts, err := createPayout(payoutRecords)
