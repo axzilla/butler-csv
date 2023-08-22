@@ -2,16 +2,11 @@ package main
 
 import (
 	"encoding/csv"
-	"errors"
 	"fmt"
-	"log"
 	"os"
-	"reflect"
-	"runtime/debug"
 	"strings"
+	"time"
 )
-
-type Records [][]string
 
 type Payout struct {
 	Date      string
@@ -20,135 +15,63 @@ type Payout struct {
 	Total     string
 }
 
-func logError(err error) {
-	trace := fmt.Sprintf("%s\n%s", err.Error(), debug.Stack())
-	log.Output(2, trace)
+func (p *Payout) fromCsvRecord(record []string) error {
+	var err error
+	p.Date, err = convertDate(record[0])
+	if err != nil {
+		return err
+	}
+	p.Recipient = "Shopify Auszahlung"
+	p.Total = makeNegative(dotToComma(record[8]))
+	p.Currency = record[9]
+	return nil
 }
 
-func getHeaderIndex(name string, headers []string) (int, error) {
-	headerIndex := -1
-
-	for i, header := range headers {
-		if header == name {
-			headerIndex = i
-			break
-		}
-	}
-
-	if headerIndex == -1 {
-		return -1, errors.New("Header not found")
-	}
-
-	return headerIndex, nil
+func makeNegative(s string) string {
+	return "-" + s
 }
 
-func getRecords(filename string) (Records, error) {
-	file, err := os.Open(filename)
+func dotToComma(s string) string {
+	return strings.ReplaceAll(s, ".", ",")
+}
+
+func convertDate(s string) (string, error) {
+	t, err := time.Parse("2006-01-02", s)
+	if err != nil {
+		return "", err
+	}
+	return t.Format("02-01-2006"), nil
+}
+
+func readPayouts() ([]Payout, error) {
+	file, err := os.Open("payouts.csv")
 	if err != nil {
 		return nil, err
 	}
-
+	defer file.Close()
 	reader := csv.NewReader(file)
 	records, err := reader.ReadAll()
 	if err != nil {
 		return nil, err
 	}
-
-	return records, nil
-}
-
-func dotToComma(field string) string {
-	return strings.ReplaceAll(field, ".", ",")
-}
-
-func convertDate(date string) string {
-	dateArr := strings.Split(date, "-")
-	year := dateArr[0]
-	month := dateArr[1]
-	day := dateArr[2]
-
-	return fmt.Sprintf("%v-%v-%v", day, month, year)
-}
-
-func validateHeader(header []string) error {
-	expectedHeader := []string{"Payout Date", "Status", "Charges", "Refunds", "Adjustments", "Reserved Funds", "Fees", "Retried Amount", "Total", "Currency"}
-
-	if !reflect.DeepEqual(header, expectedHeader) {
-		return fmt.Errorf("unexpected header: got %v, want %v", header, expectedHeader)
-	}
-
-	return nil
-}
-
-func printRecordLines(records Records) {
-	for _, record := range records {
-		fmt.Println(record)
-	}
-}
-
-func createPayout(payoutRecords Records) ([]Payout, error) {
 	var payouts []Payout
-
-	header := payoutRecords[0]
-	err := validateHeader(header)
-	if err != nil {
-		return nil, err
-	}
-
-	statusIndex, err := getHeaderIndex("Status", header)
-	if err != nil {
-		return nil, err
-	}
-
-	dateIndex, err := getHeaderIndex("Payout Date", header)
-	if err != nil {
-		return nil, err
-	}
-
-	totalIndex, err := getHeaderIndex("Total", header)
-	if err != nil {
-		return nil, err
-	}
-
-	currencyIndex, err := getHeaderIndex("Currency", header)
-	if err != nil {
-		return nil, err
-	}
-
-	for _, payoutRecord := range payoutRecords {
-		if payoutRecord[statusIndex] == "paid" {
-			date := convertDate(payoutRecord[dateIndex])
-			recipient := "Shopify Auszahlung"
-			total := dotToComma(payoutRecord[totalIndex])
-			currency := payoutRecord[currencyIndex]
-
-			payout := Payout{
-				Date:      date,
-				Recipient: recipient,
-				Total:     total,
-				Currency:  currency,
+	for _, record := range records {
+		if record[1] == "paid" {
+			var p Payout
+			err := p.fromCsvRecord(record)
+			if err != nil {
+				return nil, err
 			}
-
-			payouts = append(payouts, payout)
+			payouts = append(payouts, p)
 		}
 	}
-
 	return payouts, nil
 }
 
 func main() {
-	payoutRecords, err := getRecords("payouts.csv")
+	payouts, err := readPayouts()
 	if err != nil {
-		logError(err)
-		return
-	}
-
-	printRecordLines(payoutRecords)
-
-	payouts, err := createPayout(payoutRecords)
-	if err != nil {
-		logError(err)
-		return
+		fmt.Println(err)
 	}
 
 	for _, payout := range payouts {
