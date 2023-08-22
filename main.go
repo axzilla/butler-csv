@@ -49,11 +49,13 @@ func readPayouts() ([]Payout, error) {
 		return nil, err
 	}
 	defer file.Close()
+
 	reader := csv.NewReader(file)
 	records, err := reader.ReadAll()
 	if err != nil {
 		return nil, err
 	}
+
 	var payouts []Payout
 	for _, record := range records {
 		if record[1] == "paid" {
@@ -65,7 +67,33 @@ func readPayouts() ([]Payout, error) {
 			payouts = append(payouts, p)
 		}
 	}
+
 	return payouts, nil
+}
+
+func writeCsv(payouts []Payout) error {
+	file, err := os.Create("new_payouts.csv")
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	writer := csv.NewWriter(file)
+	defer writer.Flush()
+
+	header := []string{"Buchungsdatum", "Zahlungspflichtiger/Empfänger", "Betrag", "Währung"}
+	if err := writer.Write(header); err != nil {
+		return err
+	}
+
+	for _, payout := range payouts {
+		row := []string{payout.Date, payout.Recipient, payout.Total, payout.Currency}
+		if err := writer.Write(row); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func main() {
@@ -74,7 +102,8 @@ func main() {
 		fmt.Println(err)
 	}
 
-	for _, payout := range payouts {
-		fmt.Println(payout)
+	err = writeCsv(payouts)
+	if err != nil {
+		fmt.Println(err)
 	}
 }
