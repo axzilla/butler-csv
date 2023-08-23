@@ -1,11 +1,9 @@
-package main
+package payout
 
 import (
 	"encoding/csv"
-	"fmt"
+	"github.com/DerbeDotDev/butler-csv/pkg/csvutil"
 	"os"
-	"strings"
-	"time"
 )
 
 type Payout struct {
@@ -17,33 +15,17 @@ type Payout struct {
 
 func (p *Payout) fromCsvRecord(record []string) error {
 	var err error
-	p.Date, err = convertDate(record[0])
+	p.Date, err = csvutil.ConvertDate(record[0])
 	if err != nil {
 		return err
 	}
 	p.Recipient = "Shopify Auszahlung"
-	p.Total = makeNegative(dotToComma(record[8]))
+	p.Total = csvutil.MakeNegative(csvutil.DotToComma(record[8]))
 	p.Currency = record[9]
 	return nil
 }
 
-func makeNegative(s string) string {
-	return "-" + s
-}
-
-func dotToComma(s string) string {
-	return strings.ReplaceAll(s, ".", ",")
-}
-
-func convertDate(s string) (string, error) {
-	t, err := time.Parse("2006-01-02", s)
-	if err != nil {
-		return "", err
-	}
-	return t.Format("02-01-2006"), nil
-}
-
-func readPayouts() ([]Payout, error) {
+func ReadPayouts() ([]Payout, error) {
 	file, err := os.Open("payouts.csv")
 	if err != nil {
 		return nil, err
@@ -71,7 +53,7 @@ func readPayouts() ([]Payout, error) {
 	return payouts, nil
 }
 
-func writeCsv(payouts []Payout) error {
+func WriteCsv(payouts []Payout) error {
 	file, err := os.Create("new_payouts.csv")
 	if err != nil {
 		return err
@@ -94,16 +76,4 @@ func writeCsv(payouts []Payout) error {
 	}
 
 	return nil
-}
-
-func main() {
-	payouts, err := readPayouts()
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	err = writeCsv(payouts)
-	if err != nil {
-		fmt.Println(err)
-	}
 }
