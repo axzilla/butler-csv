@@ -17,8 +17,12 @@ func MakeNegative(s string) (string, error) {
 	return negativeString, nil
 }
 
-func DotToComma(s string) string {
-	return strings.ReplaceAll(s, ".", ",")
+func DotToComma(s string) (string, error) {
+	_, err := strconv.ParseFloat(s, 64)
+	if err != nil {
+		return "", err
+	}
+	return strings.ReplaceAll(s, ".", ","), nil
 }
 
 func ConvertDate(s string) (string, error) {
