@@ -1,4 +1,4 @@
-package payout
+package shopify
 
 import (
 	"encoding/csv"
@@ -25,8 +25,8 @@ func (p *Payout) fromCsvRecord(record []string) error {
 	return nil
 }
 
-func ReadPayouts() ([]Payout, error) {
-	file, err := os.Open("payouts.csv")
+func ReadPayouts(csvPath string) ([]Payout, error) {
+	file, err := os.Open(csvPath)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +53,7 @@ func ReadPayouts() ([]Payout, error) {
 	return payouts, nil
 }
 
-func WriteCsv(payouts []Payout) error {
+func WriteCsv(payouts []Payout, csvPath string) error {
 	file, err := os.Create("new_payouts.csv")
 	if err != nil {
 		return err

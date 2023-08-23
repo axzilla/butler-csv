@@ -2,17 +2,31 @@ package main
 
 import (
 	"fmt"
-	"github.com/DerbeDotDev/butler-csv/pkg/shopify/payout"
+	"os"
+	"path/filepath"
+
+	"github.com/DerbeDotDev/butler-csv/pkg/shopify"
 )
 
 func main() {
-	payouts, err := payout.ReadPayouts()
+	wd, err := os.Getwd()
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("Error getting working directory:", err)
+		return
 	}
 
-	err = payout.WriteCsv(payouts)
+	payoutCsvPath := filepath.Join(wd, "payouts.csv")
+	newPayoutCsvPath := filepath.Join(wd, "new_payouts.csv")
+
+	payouts, err := shopify.ReadPayouts(payoutCsvPath)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("Error reading payouts:", err)
+		return
+	}
+
+	err = shopify.WriteCsv(payouts, newPayoutCsvPath)
+	if err != nil {
+		fmt.Println("Error writing new payouts:", err)
+		return
 	}
 }
