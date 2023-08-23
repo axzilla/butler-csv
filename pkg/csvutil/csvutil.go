@@ -1,12 +1,20 @@
 package csvutil
 
 import (
+	"fmt"
+	"strconv"
 	"strings"
 	"time"
 )
 
-func MakeNegative(s string) string {
-	return "-" + s
+func MakeNegative(s string) (string, error) {
+	num, err := strconv.ParseFloat(s, 64)
+	if err != nil {
+		return "", err
+	}
+	negativeNum := -num
+	negativeString := fmt.Sprintf("%.2f", negativeNum)
+	return negativeString, nil
 }
 
 func DotToComma(s string) string {
