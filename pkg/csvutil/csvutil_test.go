@@ -26,11 +26,26 @@ func TestMakeNegativ(t *testing.T) {
 }
 
 func TestDotToComma(t *testing.T) {
-	got := DotToComma("34.99")
-	want := "34,99"
-	if got != want {
-		t.Errorf("got %q, want %q", got, want)
-	}
+	t.Run("Happy Path", func(t *testing.T) {
+		got, err := DotToComma("4.50")
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		want := "4,50"
+		if got != want {
+			t.Errorf("got %q, want %q", got, want)
+		}
+	})
+
+	t.Run("Error Case", func(t *testing.T) {
+		got, err := DotToComma("abc")
+		if err == nil {
+			t.Fatalf("expected an error but got none")
+		}
+		if got != "" {
+			t.Errorf("expected an empty string, got %q", got)
+		}
+	})
 }
 
 func TestConvertDate(t *testing.T) {

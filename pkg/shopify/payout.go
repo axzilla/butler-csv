@@ -27,7 +27,10 @@ func (p *Payout) fromCsvRecord(record []string) error {
 		return err
 	}
 
-	p.Total = csvutil.DotToComma(negativeTotal)
+	p.Total, err = csvutil.DotToComma(negativeTotal)
+	if err != nil {
+		return err
+	}
 
 	p.Currency = record[9]
 
