@@ -19,9 +19,18 @@ func (p *Payout) fromCsvRecord(record []string) error {
 	if err != nil {
 		return err
 	}
+
 	p.Recipient = "Shopify Auszahlung"
-	p.Total = csvutil.MakeNegative(csvutil.DotToComma(record[8]))
+
+	negativeTotal, err := csvutil.MakeNegative(record[0])
+	if err != nil {
+		return err
+	}
+
+	p.Total = csvutil.DotToComma(negativeTotal)
+
 	p.Currency = record[9]
+
 	return nil
 }
 
