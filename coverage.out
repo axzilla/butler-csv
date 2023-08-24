@@ -1,0 +1,10 @@
+mode: set
+github.com/DerbeDotDev/butler-csv/pkg/csvutil/csvutil.go:10.45,12.16 2 1
+github.com/DerbeDotDev/butler-csv/pkg/csvutil/csvutil.go:12.16,14.3 1 1
+github.com/DerbeDotDev/butler-csv/pkg/csvutil/csvutil.go:15.2,15.39 1 1
+github.com/DerbeDotDev/butler-csv/pkg/csvutil/csvutil.go:18.43,20.16 2 1
+github.com/DerbeDotDev/butler-csv/pkg/csvutil/csvutil.go:20.16,22.3 1 1
+github.com/DerbeDotDev/butler-csv/pkg/csvutil/csvutil.go:23.2,23.45 1 1
+github.com/DerbeDotDev/butler-csv/pkg/csvutil/csvutil.go:26.44,28.16 2 1
+github.com/DerbeDotDev/butler-csv/pkg/csvutil/csvutil.go:28.16,30.3 1 0
+github.com/DerbeDotDev/butler-csv/pkg/csvutil/csvutil.go:31.2,31.36 1 1
