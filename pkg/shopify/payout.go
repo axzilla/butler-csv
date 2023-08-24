@@ -10,7 +10,7 @@ type Payout struct {
 	Date      string
 	Currency  string
 	Recipient string
-	Total     string
+	Amount    string
 }
 
 func (p *Payout) fromCsvRecord(record []string) error {
@@ -27,7 +27,7 @@ func (p *Payout) fromCsvRecord(record []string) error {
 		return err
 	}
 
-	p.Total, err = csvutil.DotToComma(negativeTotal)
+	p.Amount, err = csvutil.DotToComma(negativeTotal)
 	if err != nil {
 		return err
 	}
@@ -81,7 +81,7 @@ func WriteCsv(payouts []Payout, csvPath string) error {
 	}
 
 	for _, payout := range payouts {
-		row := []string{payout.Date, payout.Recipient, payout.Total, payout.Currency}
+		row := []string{payout.Date, payout.Recipient, payout.Amount, payout.Currency}
 		if err := writer.Write(row); err != nil {
 			return err
 		}
