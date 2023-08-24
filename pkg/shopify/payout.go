@@ -7,6 +7,13 @@ import (
 	"github.com/DerbeDotDev/butler-csv/pkg/csvutil"
 )
 
+const (
+	payoutDateIndex = 0
+	statusIndex     = 1
+	totalIndex      = 8
+	currencyIndex   = 9
+)
+
 type Payout struct {
 	Date      string
 	Currency  string
@@ -16,14 +23,14 @@ type Payout struct {
 
 func (p *Payout) fromCsvRecord(record []string) error {
 	var err error
-	p.Date, err = csvutil.ConvertDate(record[0])
+	p.Date, err = csvutil.ConvertDate(record[payoutDateIndex])
 	if err != nil {
 		return err
 	}
 
 	p.Recipient = "Shopify Auszahlung"
 
-	negativeTotal, err := csvutil.MakeNegative(record[8])
+	negativeTotal, err := csvutil.MakeNegative(record[totalIndex])
 	if err != nil {
 		return err
 	}
@@ -33,9 +40,13 @@ func (p *Payout) fromCsvRecord(record []string) error {
 		return err
 	}
 
-	p.Currency = record[9]
+	p.Currency = record[currencyIndex]
 
 	return nil
+}
+
+func (p *Payout) isPaid(record []string) bool {
+	return record[statusIndex] == "paid"
 }
 
 func ReadPayouts(csvPath string) ([]Payout, error) {
@@ -60,8 +71,8 @@ func ReadPayouts(csvPath string) ([]Payout, error) {
 
 	var payouts []Payout
 	for _, record := range records {
-		if record[1] == "paid" {
-			var p Payout
+		var p Payout
+		if p.isPaid(record) {
 			err := p.fromCsvRecord(record)
 			if err != nil {
 				return nil, err
