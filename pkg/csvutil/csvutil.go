@@ -12,9 +12,7 @@ func MakeNegative(s string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	negativeNum := -num
-	negativeString := fmt.Sprintf("%.2f", negativeNum)
-	return negativeString, nil
+	return fmt.Sprintf("%.2f", -num), nil
 }
 
 func DotToComma(s string) (string, error) {
