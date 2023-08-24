@@ -54,14 +54,14 @@ func TestConvertDate(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		want := "02-01-2006"
+		want := "02.01.2006"
 		if got != want {
 			t.Errorf("got %q, want %q", got, want)
 		}
 	})
 
 	t.Run("Error Case", func(t *testing.T) {
-		got, err := DotToComma("abc")
+		got, err := ConvertDate("abc")
 		if err == nil {
 			t.Fatalf("expected an error but got none")
 		}

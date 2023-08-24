@@ -28,5 +28,5 @@ func ConvertDate(s string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return t.Format("02-01-2006"), nil
+	return t.Format("02.01.2006"), nil
 }
