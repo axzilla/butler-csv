@@ -2,6 +2,35 @@ package csvutil
 
 import "testing"
 
+func TestValidateCsvHeader(t *testing.T) {
+	t.Run("Happy Path", func(t *testing.T) {
+		actualHeaders := []string{"Payout Date", "Status", "Charges", "Refunds", "Adjustments", "Reserved Funds", "Fees", "Retried Amount", "Total", "Currency"}
+		expectedHeaders := []string{"Payout Date", "Status", "Charges", "Refunds", "Adjustments", "Reserved Funds", "Fees", "Retried Amount", "Total", "Currency"}
+		err := ValidateCsvHeader(actualHeaders, expectedHeaders)
+		if err != nil {
+			t.Errorf("Expected no error, but got: %v", err)
+		}
+	})
+
+	t.Run("Error Case: Missing Header", func(t *testing.T) {
+		actualHeaders := []string{"Payout Date", "Status", "Charges", "Refunds", "Adjustments", "Reserved Funds", "Fees", "Retried Amount", "Total"}
+		expectedHeaders := []string{"Payout Date", "Status", "Charges", "Refunds", "Adjustments", "Reserved Funds", "Fees", "Retried Amount", "Total", "Currency"}
+		err := ValidateCsvHeader(actualHeaders, expectedHeaders)
+		if err == nil {
+			t.Errorf("Expected an error, but got none")
+		}
+	})
+
+	t.Run("Error Case: Wrong Header", func(t *testing.T) {
+		actualHeaders := []string{"abc", "Status", "Charges", "Refunds", "Adjustments", "Reserved Funds", "Fees", "Retried Amount", "Total", "Currency"}
+		expectedHeaders := []string{"Payout Date", "Status", "Charges", "Refunds", "Adjustments", "Reserved Funds", "Fees", "Retried Amount", "Total", "Currency"}
+		err := ValidateCsvHeader(actualHeaders, expectedHeaders)
+		if err == nil {
+			t.Errorf("Expected an error, but got none")
+		}
+	})
+}
+
 func TestMakeNegativ(t *testing.T) {
 	t.Run("Happy Path", func(t *testing.T) {
 		got, err := MakeNegative("4.50")

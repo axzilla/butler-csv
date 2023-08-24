@@ -2,8 +2,9 @@ package shopify
 
 import (
 	"encoding/csv"
-	"github.com/DerbeDotDev/butler-csv/pkg/csvutil"
 	"os"
+
+	"github.com/DerbeDotDev/butler-csv/pkg/csvutil"
 )
 
 type Payout struct {
@@ -46,6 +47,13 @@ func ReadPayouts(csvPath string) ([]Payout, error) {
 
 	reader := csv.NewReader(file)
 	records, err := reader.ReadAll()
+	if err != nil {
+		return nil, err
+	}
+
+	actualHeaders := records[0]
+	expectedHeaders := []string{"Payout Date", "Status", "Charges", "Refunds", "Adjustments", "Reserved Funds", "Fees", "Retried Amount", "Total", "Currency"}
+	err = csvutil.ValidateCsvHeader(actualHeaders, expectedHeaders)
 	if err != nil {
 		return nil, err
 	}
