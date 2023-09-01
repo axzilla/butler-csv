@@ -1,6 +1,12 @@
 package shopify
 
-import "fmt"
+import (
+	"github.com/DerbeDotDev/butler-csv/pkg/csvutil"
+)
+
+const (
+	transactionDateIndex = 0
+)
 
 type Transaction struct {
 	PayoutDate       string
@@ -12,8 +18,20 @@ type Transaction struct {
 	Purpose          string
 }
 
-func (t *Transaction) fromCsvRecord(record []string) {
-	fmt.Println("hello world")
+func (t *Transaction) fromCsvRecord(record []string) error {
+	var err error
+	t.PayoutDate, err = csvutil.ConvertDate(record[transactionDateIndex])
+	if err != nil {
+		return err
+	}
+
+	// zahlungsreferenz
+	// empfaenger
+	// auftragsart
+	// buchungstext
+	// betrag
+	// verwendungszweck
+	return nil
 }
 
 func (t *Transaction) isPaid(record []string) bool {
