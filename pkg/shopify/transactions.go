@@ -6,6 +6,12 @@ import (
 
 const (
 	transactionDateIndex = 0
+	typeIndex            = 1
+	orderIndex           = 3
+	cardBrandIndex       = 4
+	payoutStatusIndex    = 6
+	amountIndex          = 9
+	purposeIndex         = 12
 )
 
 type Transaction struct {
@@ -25,12 +31,21 @@ func (t *Transaction) fromCsvRecord(record []string) error {
 		return err
 	}
 
-	// zahlungsreferenz
-	// empfaenger
-	// auftragsart
-	// buchungstext
-	// betrag
-	// verwendungszweck
+	t.PaymentReference = record[orderIndex]
+
+	t.Recipient = record[orderIndex] + " " + record[typeIndex]
+
+	t.OrderType = record[cardBrandIndex]
+
+	t.BookingText = record[payoutStatusIndex]
+
+	t.Amount, err = csvutil.DotToComma(record[amountIndex])
+	if err != nil {
+		return err
+	}
+
+	t.Purpose = record[purposeIndex]
+
 	return nil
 }
 
