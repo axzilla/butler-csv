@@ -29,19 +29,19 @@ func main() {
 		fmt.Println("Error writing new payouts:", err)
 		return
 	}
-	//
-	// transactionCsvPath := filepath.Join(wd, "transactions.csv")
-	// newTransactionCsvPath := filepath.Join(wd, "new_transactions.csv")
-	//
-	// transactions, err := shopify.ReadTransactions(transactionCsvPath)
-	// if err != nil {
-	// 	fmt.Println("Error reading transactions:", err)
-	// 	return
-	// }
-	//
-	// err = shopify.WriteTransactions(transactions, newTransactionCsvPath)
-	// if err != nil {
-	// 	fmt.Println("Error writing new transactions:", err)
-	// 	return
-	// }
+
+	transactionCsvPath := filepath.Join(wd, "transactions.csv")
+	newTransactionCsvPath := filepath.Join(wd, "new_transactions.csv")
+
+	transactions, err := shopify.ReadTransactions(transactionCsvPath)
+	if err != nil {
+		fmt.Println("Error reading transactions:", err)
+		return
+	}
+
+	err = shopify.WriteTransactions(transactions, newTransactionCsvPath)
+	if err != nil {
+		fmt.Println("Error writing new transactions:", err)
+		return
+	}
 }
