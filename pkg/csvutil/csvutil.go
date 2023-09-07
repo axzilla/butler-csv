@@ -36,7 +36,13 @@ func DotToComma(s string) (string, error) {
 }
 
 func ConvertDate(s string) (string, error) {
-	t, err := time.Parse("2006-01-02", s)
+	var t time.Time
+	var err error
+	if strings.Contains(s, ":") {
+		t, err = time.Parse("2006-01-02 15:04:05 -0700", s)
+	} else {
+		t, err = time.Parse("2006-01-02", s)
+	}
 	if err != nil {
 		return "", err
 	}

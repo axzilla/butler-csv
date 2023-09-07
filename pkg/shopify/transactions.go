@@ -10,11 +10,11 @@ import (
 const (
 	transactionDateIndex = 0
 	typeIndex            = 1
-	orderIndex           = 3
-	cardBrandIndex       = 4
-	payoutStatusIndex    = 6
-	amountIndex          = 9
-	purposeIndex         = 12
+	orderIndex           = 2
+	cardBrandIndex       = 3
+	payoutStatusIndex    = 5
+	amountIndex          = 8
+	checkoutIndex        = 11
 )
 
 type Transaction struct {
@@ -47,13 +47,13 @@ func (t *Transaction) fromCsvRecord(record []string) error {
 		return err
 	}
 
-	t.Purpose = record[purposeIndex]
+	t.Purpose = record[checkoutIndex]
 
 	return nil
 }
 
 func (t *Transaction) isPaid(record []string) bool {
-	return record[6] != "paid"
+	return record[payoutStatusIndex] == "paid"
 }
 
 func ReadTransactions(csvPath string) ([]Transaction, error) {
