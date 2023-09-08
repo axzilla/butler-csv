@@ -15,6 +15,7 @@ func main() {
 		return
 	}
 
+	// PAYOUTS
 	payoutCsvPath := filepath.Join(wd, "payouts.csv")
 	newPayoutCsvPath := filepath.Join(wd, "new_payouts.csv")
 
@@ -30,6 +31,7 @@ func main() {
 		return
 	}
 
+	// TRANSACTIONS
 	transactionCsvPath := filepath.Join(wd, "transactions.csv")
 	newTransactionCsvPath := filepath.Join(wd, "new_transactions.csv")
 
