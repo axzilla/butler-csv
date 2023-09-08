@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -9,39 +10,44 @@ import (
 )
 
 func main() {
-	wd, err := os.Getwd()
-	if err != nil {
-		fmt.Println("Error getting working directory:", err)
-		return
+	var input string
+	var output string
+
+	flag.StringVar(&input, "input", "", "Path to the input CSV")
+	flag.StringVar(&output, "output", "", "Path to save the new CSV")
+
+	flag.Parse()
+
+	if input == "" || output == "" {
+		fmt.Println("Both input and output flags are required.")
+		os.Exit(1)
 	}
 
-	// PAYOUTS
-	payoutCsvPath := filepath.Join(wd, "payouts.csv")
-	newPayoutCsvPath := filepath.Join(wd, "new_payouts.csv")
+	payoutInput := filepath.Join(input, "payouts.csv")
+	payoutOutput := filepath.Join(output, "new_payouts.csv")
 
-	payouts, err := shopify.ReadPayouts(payoutCsvPath)
+	payouts, err := shopify.ReadPayouts(payoutInput)
 	if err != nil {
 		fmt.Println("Error reading payouts:", err)
 		return
 	}
 
-	err = shopify.WriteCsv(payouts, newPayoutCsvPath)
+	err = shopify.WriteCsv(payouts, payoutOutput)
 	if err != nil {
 		fmt.Println("Error writing new payouts:", err)
 		return
 	}
 
-	// TRANSACTIONS
-	transactionCsvPath := filepath.Join(wd, "transactions.csv")
-	newTransactionCsvPath := filepath.Join(wd, "new_transactions.csv")
+	transactionInput := filepath.Join(input, "transactions.csv")
+	transactionOutput := filepath.Join(output, "new_transactions.csv")
 
-	transactions, err := shopify.ReadTransactions(transactionCsvPath)
+	transactions, err := shopify.ReadTransactions(transactionInput)
 	if err != nil {
 		fmt.Println("Error reading transactions:", err)
 		return
 	}
 
-	err = shopify.WriteTransactions(transactions, newTransactionCsvPath)
+	err = shopify.WriteTransactions(transactions, transactionOutput)
 	if err != nil {
 		fmt.Println("Error writing new transactions:", err)
 		return

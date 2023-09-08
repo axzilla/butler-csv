@@ -116,7 +116,7 @@ func ReadTransactions(csvPath string) ([]Transaction, error) {
 }
 
 func WriteTransactions(transactions []Transaction, csvPath string) error {
-	file, err := os.Create("new_transactions.csv")
+	file, err := os.Create(csvPath)
 	if err != nil {
 		return err
 	}

@@ -97,7 +97,7 @@ func ReadPayouts(csvPath string) ([]Payout, error) {
 }
 
 func WriteCsv(payouts []Payout, csvPath string) error {
-	file, err := os.Create("new_payouts.csv")
+	file, err := os.Create(csvPath)
 	if err != nil {
 		return err
 	}
