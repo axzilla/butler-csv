@@ -147,8 +147,20 @@ func WriteTransactions(transactions []Transaction, csvPath string) error {
 		}
 		fees += num
 	}
+	convertedFees, err := csvutil.MakeNegative(fmt.Sprintf("%.2f", fees))
 
-	fmt.Println(fees)
+	feeRow := []string{
+		transactions[0].PayoutDate,
+		"Shopify",
+		"Gebühren " + transactions[len(transactions)-1].PayoutDate + " - " + transactions[0].PayoutDate,
+		"",
+		"Shopify Gebühren",
+		convertedFees,
+		"",
+	}
+	if err := writer.Write(feeRow); err != nil {
+		return err
+	}
 
 	for _, transaction := range transactions {
 		row := []string{
