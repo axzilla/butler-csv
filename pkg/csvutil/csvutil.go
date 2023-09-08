@@ -9,11 +9,20 @@ import (
 
 func ValidateCsvHeader(actualHeaders []string, expectedHeaders []string) error {
 	if len(actualHeaders) != len(expectedHeaders) {
-		return fmt.Errorf("Invalid CSV header length. Expected %d columns, but found %d", len(expectedHeaders), len(actualHeaders))
+		return fmt.Errorf(
+			"Invalid CSV header length. Expected %d columns, but found %d",
+			len(expectedHeaders),
+			len(actualHeaders),
+		)
 	}
 	for i, actualHeader := range actualHeaders {
 		if actualHeader != expectedHeaders[i] {
-			return fmt.Errorf("Invalid header at index %d. Expected '%s', but found '%s'", i, expectedHeaders[i], actualHeader)
+			return fmt.Errorf(
+				"Invalid header at index %d. Expected '%s', but found '%s'",
+				i,
+				expectedHeaders[i],
+				actualHeader,
+			)
 		}
 	}
 	return nil

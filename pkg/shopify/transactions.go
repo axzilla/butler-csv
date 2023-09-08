@@ -2,7 +2,9 @@ package shopify
 
 import (
 	"encoding/csv"
+	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/DerbeDotDev/butler-csv/pkg/csvutil"
 )
@@ -14,6 +16,7 @@ const (
 	cardBrandIndex       = 3
 	payoutStatusIndex    = 5
 	amountIndex          = 8
+	feeIndex             = 9
 	checkoutIndex        = 11
 )
 
@@ -25,6 +28,7 @@ type Transaction struct {
 	BookingText      string
 	Amount           string
 	Purpose          string
+	Fee              string
 }
 
 func (t *Transaction) fromCsvRecord(record []string) error {
@@ -35,6 +39,8 @@ func (t *Transaction) fromCsvRecord(record []string) error {
 	}
 
 	t.PaymentReference = record[orderIndex]
+
+	t.Fee = record[feeIndex]
 
 	t.Recipient = record[orderIndex] + " " + record[typeIndex]
 
@@ -70,7 +76,25 @@ func ReadTransactions(csvPath string) ([]Transaction, error) {
 	}
 
 	actualHeader := records[0]
-	expectedHeader := []string{"Transaction Date", "Type", "Order", "Card Brand", "Card Source", "Payout Status", "Payout Date", "Available On", "Amount", "Fee", "Net", "Checkout", "Payment Method Name", "Presentment Amount", "Presentment Currency", "Currency"}
+	expectedHeader := []string{
+		"Transaction Date",
+		"Type",
+		"Order",
+		"Card Brand",
+		"Card Source",
+		"Payout Status",
+		"Payout Date",
+		"Available On",
+		"Amount",
+		"Fee",
+		"Net",
+		"Checkout",
+		"Payment Method Name",
+		"Presentment Amount",
+		"Presentment Currency",
+		"Currency",
+	}
+
 	err = csvutil.ValidateCsvHeader(actualHeader, expectedHeader)
 	if err != nil {
 		return nil, err
@@ -101,13 +125,42 @@ func WriteTransactions(transactions []Transaction, csvPath string) error {
 	writer := csv.NewWriter(file)
 	defer writer.Flush()
 
-	header := []string{"Buchungsdatum", "Zahlungsreferenz", "Zahlungspflichtiger/Empfänger", "Auftragsart", "Buchungstext", "Betrag", "Verwendungszweck"}
+	header := []string{
+		"Buchungsdatum",
+		"Zahlungsreferenz",
+		"Zahlungspflichtiger/Empfänger",
+		"Auftragsart",
+		"Buchungstext",
+		"Betrag",
+		"Verwendungszweck",
+	}
+
 	if err := writer.Write(header); err != nil {
 		return err
 	}
 
+	var fees float64
 	for _, transaction := range transactions {
-		row := []string{transaction.PayoutDate, transaction.PaymentReference, transaction.Recipient, transaction.OrderType, transaction.BookingText, transaction.Amount, transaction.Purpose}
+		num, err := strconv.ParseFloat(transaction.Fee, 64)
+		if err != nil {
+			return err
+		}
+		fees += num
+	}
+
+	fmt.Println(fees)
+
+	for _, transaction := range transactions {
+		row := []string{
+			transaction.PayoutDate,
+			transaction.PaymentReference,
+			transaction.Recipient,
+			transaction.OrderType,
+			transaction.BookingText,
+			transaction.Amount,
+			transaction.Purpose,
+		}
+
 		if err := writer.Write(row); err != nil {
 			return err
 		}

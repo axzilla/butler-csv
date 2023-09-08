@@ -63,7 +63,19 @@ func ReadPayouts(csvPath string) ([]Payout, error) {
 	}
 
 	actualHeaders := records[0]
-	expectedHeaders := []string{"Payout Date", "Status", "Charges", "Refunds", "Adjustments", "Reserved Funds", "Fees", "Retried Amount", "Total", "Currency"}
+	expectedHeaders := []string{
+		"Payout Date",
+		"Status",
+		"Charges",
+		"Refunds",
+		"Adjustments",
+		"Reserved Funds",
+		"Fees",
+		"Retried Amount",
+		"Total",
+		"Currency",
+	}
+
 	err = csvutil.ValidateCsvHeader(actualHeaders, expectedHeaders)
 	if err != nil {
 		return nil, err
@@ -94,13 +106,25 @@ func WriteCsv(payouts []Payout, csvPath string) error {
 	writer := csv.NewWriter(file)
 	defer writer.Flush()
 
-	header := []string{"Buchungsdatum", "Zahlungspflichtiger/Empfänger", "Betrag", "Währung"}
+	header := []string{
+		"Buchungsdatum",
+		"Zahlungspflichtiger/Empfänger",
+		"Betrag",
+		"Währung",
+	}
+
 	if err := writer.Write(header); err != nil {
 		return err
 	}
 
 	for _, payout := range payouts {
-		row := []string{payout.Date, payout.Recipient, payout.Amount, payout.Currency}
+		row := []string{
+			payout.Date,
+			payout.Recipient,
+			payout.Amount,
+			payout.Currency,
+		}
+
 		if err := writer.Write(row); err != nil {
 			return err
 		}
